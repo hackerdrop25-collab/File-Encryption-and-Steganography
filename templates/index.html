@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Welcome to File Security</h1>
+        <p class="lead text-muted">Secure your files with encryption and steganography</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">File Encryption</h3>
+                    <p class="card-text">Protect your sensitive files with strong encryption</p>
+                    <div class="d-grid gap-2">
+                        <a href="/generate_key" class="btn btn-primary">
+                            <i class="fas fa-key me-2"></i>Generate Key
+                        </a>
+                        <a href="/encrypt" class="btn btn-primary">
+                            <i class="fas fa-lock me-2"></i>Encrypt File
+                        </a>
+                        <a href="/decrypt" class="btn btn-success">
+                            <i class="fas fa-unlock me-2"></i>Decrypt File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-secret fa-3x text-info mb-3"></i>
+                    <h3 class="card-title">Steganography</h3>
+                    <p class="card-text">Hide and extract messages using steganography</p>
+                    <div class="d-grid gap-2">
+                        <a href="/steganography" class="btn btn-info">
+                            <i class="fas fa-user-secret me-2"></i>Go to Steganography
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">How It Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>File Encryption:</h6>
+                            <ol class="list-group list-group-numbered">
+                                <li class="list-group-item">Generate an encryption key</li>
+                                <li class="list-group-item">Use the key to encrypt your files</li>
+                                <li class="list-group-item">Use the same key to decrypt files</li>
+                            </ol>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Steganography:</h6>
+                            <ol class="list-group list-group-numbered">
+                                <li class="list-group-item">Hide messages in text files</li>
+                                <li class="list-group-item">Extract hidden messages</li>
+                                <li class="list-group-item">Keep your secrets safe</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %} 

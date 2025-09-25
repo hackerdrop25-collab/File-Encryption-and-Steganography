@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Decrypt File</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/decrypt" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Select Encrypted File</label>
+                            <input type="file" class="form-control form-control-lg" id="file" name="file" required>
+                            <div class="invalid-feedback">Please select an encrypted file.</div>
+                            <div class="form-text">Choose the encrypted file you want to decrypt.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="key" class="form-label">Encryption Key File</label>
+                            <input type="file" class="form-control form-control-lg" id="key" name="key" accept=".key" required>
+                            <div class="invalid-feedback">Please select the key file used for encryption.</div>
+                            <div class="form-text">Select the same .key file that was used to encrypt this file.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-unlock me-2"></i>Decrypt File
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Instructions</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="list-group list-group-numbered">
+                        <li class="list-group-item">Select the encrypted file you want to decrypt</li>
+                        <li class="list-group-item">Upload the same key file that was used to encrypt the file</li>
+                        <li class="list-group-item">Click "Decrypt File" to process</li>
+                        <li class="list-group-item">The decrypted file will be downloaded automatically</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %} 

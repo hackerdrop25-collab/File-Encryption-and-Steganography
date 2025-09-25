@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Steganography</h1>
+        <p class="lead text-muted">Hide and extract messages using steganography</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Hide Message</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/hide_message" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Select Text File</label>
+                            <input type="file" class="form-control form-control-lg" id="file" name="file" accept=".txt" required>
+                            <div class="invalid-feedback">Please select a text file.</div>
+                            <div class="form-text text-muted">Choose a text file to hide your message in</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message to Hide</label>
+                            <textarea class="form-control form-control-lg" id="message" name="message" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please enter a message to hide.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info btn-lg">
+                                <i class="fas fa-user-secret me-2"></i>Hide Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Extract Message</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/extract_message" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        <div class="mb-4">
+                            <label for="file" class="form-label">Select Text File</label>
+                            <input type="file" class="form-control form-control-lg" id="file" name="file" accept=".txt" required>
+                            <div class="invalid-feedback">Please select a text file.</div>
+                            <div class="form-text text-muted">Upload the file that was created by the Hide Message feature</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info btn-lg">
+                                <i class="fas fa-search me-2"></i>Extract Message
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if extracted_message %}
+                    <div class="mt-4">
+                        <h5>Extracted Message:</h5>
+                        <div class="alert alert-info">
+                            <p class="mb-0">{{ extracted_message }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
+</script>
+{% endblock %} 
