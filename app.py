@@ -139,71 +139,47 @@ def hide_message():
     if file.filename == '' or not message:
         flash('No file selected or message provided', 'error')
         return redirect(url_for('steganography'))
-    
     if not allowed_file(file.filename):
         flash('Only text files (.txt) are supported', 'error')
         return redirect(url_for('steganography'))
-    
     try:
-        # Save uploaded file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         file.save(file_path)
-        
-        # Verify it's a text file
         if not is_text_file(file_path):
             os.remove(file_path)
             flash('The file is not a valid text file', 'error')
             return redirect(url_for('steganography'))
-        
-        # Hide message
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'hidden_{secure_filename(file.filename)}')
         crypto.hide_message(file_path, message, output_path)
-        
-        # Clean up
         os.remove(file_path)
-        
         return send_file(output_path, as_attachment=True)
     except Exception as e:
         flash(f'Failed to hide message: {str(e)}', 'error')
         return redirect(url_for('steganography'))
-
 @app.route('/extract_message', methods=['POST'])
 def extract_message():
     if 'file' not in request.files:
         flash('No file selected', 'error')
         return redirect(url_for('steganography'))
-    
     file = request.files['file']
-    
     if file.filename == '':
         flash('No file selected', 'error')
         return redirect(url_for('steganography'))
-    
     if not allowed_file(file.filename):
         flash('Only text files (.txt) are supported', 'error')
         return redirect(url_for('steganography'))
-    
     try:
-        # Save uploaded file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         file.save(file_path)
-        
-        # Verify it's a text file
         if not is_text_file(file_path):
             os.remove(file_path)
             flash('The file is not a valid text file', 'error')
             return redirect(url_for('steganography'))
-        
-        # Extract message
         message = crypto.extract_message(file_path)
-        
-        # Clean up
         os.remove(file_path)
-        
         return render_template('steganography.html', extracted_message=message)
     except Exception as e:
         flash(f'Failed to extract message: {str(e)}', 'error')
         return redirect(url_for('steganography'))
-
 if __name__ == '__main__':
     app.run(debug=True) 
