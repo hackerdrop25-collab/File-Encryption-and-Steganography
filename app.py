@@ -7,19 +7,16 @@ import time
 import shutil
 import mimetypes
 from cryptography.fernet import Fernet
-
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Change this to a secure secret key
+app.secret_key = 'your-secret-key-here'  
 crypto = CryptoStego()
 
 # Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
-
 def safe_remove(file_path, max_attempts=3):
     """Safely remove a file with retries"""
     for attempt in range(max_attempts):
@@ -33,7 +30,6 @@ def safe_remove(file_path, max_attempts=3):
             else:
                 print(f"Warning: Could not remove file {file_path}: {str(e)}")
                 return False
-
 def safe_send_file(file_path, download_name=None):
     """Safely send a file with cleanup"""
     try:
@@ -46,11 +42,9 @@ def safe_send_file(file_path, download_name=None):
     finally:
         # Schedule file cleanup
         safe_remove(file_path)
-
 def allowed_file(filename):
     """Check if the file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'txt'}
-
 def is_text_file(file_path):
     """Check if a file is a text file"""
     try:
@@ -59,21 +53,17 @@ def is_text_file(file_path):
         return True
     except:
         return False
-
 def calculate_required_lines(message_length):
     """Calculate required lines for steganography"""
     bits_per_line = 2
     total_bits = 32 + (message_length * 8)  # 32 bits for length + message bits
     return (total_bits + bits_per_line - 1) // bits_per_line
-
 @app.route('/')
 def index():
     return render_template('index.html')
-
 @app.route('/steganography')
 def steganography():
     return render_template('steganography.html')
-
 @app.route('/generate_key', methods=['GET', 'POST'])
 def generate_key():
     if request.method == 'GET':
@@ -87,7 +77,6 @@ def generate_key():
     except Exception as e:
         flash(f'Error generating key: {str(e)}', 'error')
         return redirect(url_for('index'))
-
 @app.route('/encrypt', methods=['GET', 'POST'])
 def encrypt():
     if request.method == 'GET':
@@ -129,7 +118,6 @@ def encrypt():
     except Exception as e:
         flash(f'Error during encryption: {str(e)}', 'error')
         return redirect(url_for('encrypt'))
-
 @app.route('/decrypt', methods=['GET', 'POST'])
 def decrypt():
     if request.method == 'GET':
@@ -171,7 +159,6 @@ def decrypt():
     except Exception as e:
         flash(f'Error during decryption: {str(e)}', 'error')
         return redirect(url_for('decrypt'))
-
 @app.route('/hide_message', methods=['POST'])
 def hide_message():
     if 'file' not in request.files or 'message' not in request.form:
@@ -211,7 +198,6 @@ def hide_message():
     except Exception as e:
         flash(f'Failed to hide message: {str(e)}', 'error')
         return redirect(url_for('steganography'))
-
 @app.route('/extract_message', methods=['POST'])
 def extract_message():
     if 'file' not in request.files:
@@ -249,6 +235,5 @@ def extract_message():
     except Exception as e:
         flash(f'Failed to extract message: {str(e)}', 'error')
         return redirect(url_for('steganography'))
-
 if __name__ == '__main__':
     app.run(debug=True) 
