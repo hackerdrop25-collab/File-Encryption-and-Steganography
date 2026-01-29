@@ -4,74 +4,66 @@
 <div class="container mt-4">
     <div class="text-center mb-5">
         <h1 class="display-4">Steganography</h1>
-        <p class="lead text-muted">Hide secret intelligence within plain sight</p>
+        <p class="lead text-muted">Hide and extract messages using steganography</p>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header" style="border-bottom: 1px solid rgba(245, 158, 11, 0.2);">
-                    <h4 class="mb-0" style="color: #f59e0b;"><i class="fas fa-eye-slash me-2"></i>Hide Message</h4>
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Hide Message</h4>
                 </div>
                 <div class="card-body">
-                    <form action="/hide_message" method="POST" enctype="multipart/form-data" class="needs-validation"
-                        novalidate>
+                    <form action="/hide_message" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <div class="mb-4">
-                            <label for="file" class="form-label">Host Text File (.txt)</label>
-                            <input type="file" class="form-control form-control-lg bg-dark text-light border-secondary"
-                                id="file" name="file" accept=".txt" required>
-                            <div class="invalid-feedback">Please select a host text file.</div>
-                            <div class="form-text text-muted">A text file to conceal your message in.</div>
+                            <label for="file" class="form-label">Select Text File</label>
+                            <input type="file" class="form-control form-control-lg" id="file" name="file" accept=".txt" required>
+                            <div class="invalid-feedback">Please select a text file.</div>
+                            <div class="form-text text-muted">Choose a text file to hide your message in</div>
                         </div>
-
+                        
                         <div class="mb-4">
-                            <label for="message" class="form-label">Secret Message</label>
-                            <textarea class="form-control form-control-lg bg-dark text-light border-secondary"
-                                id="message" name="message" rows="4" placeholder="Enter your secret message here..."
-                                required></textarea>
-                            <div class="invalid-feedback">Cannot hide an empty message.</div>
+                            <label for="message" class="form-label">Message to Hide</label>
+                            <textarea class="form-control form-control-lg" id="message" name="message" rows="3" required></textarea>
+                            <div class="invalid-feedback">Please enter a message to hide.</div>
                         </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg"
-                                style="background-color: #f59e0b; border: none; color: #fff;">
-                                <i class="fas fa-user-secret me-2"></i>Generate Hidden Message
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info btn-lg">
+                                <i class="fas fa-user-secret me-2"></i>Hide Message
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
-
+        
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header">
-                    <h4 class="mb-0" style="color: var(--accent-color);"><i class="fas fa-search me-2"></i>Extract
-                        Message</h4>
+            <div class="card shadow h-100">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Extract Message</h4>
                 </div>
                 <div class="card-body">
-                    <form action="/extract_message" method="POST" enctype="multipart/form-data" class="needs-validation"
-                        novalidate>
+                    <form action="/extract_message" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                         <div class="mb-4">
-                            <label for="file" class="form-label">Encoded Text File</label>
-                            <input type="file" class="form-control form-control-lg bg-dark text-light border-secondary"
-                                id="file" name="file" accept=".txt" required>
-                            <div class="invalid-feedback">Please select an encoded file.</div>
-                            <div class="form-text text-muted">Upload the file containing the hidden message.</div>
+                            <label for="file" class="form-label">Select Text File</label>
+                            <input type="file" class="form-control form-control-lg" id="file" name="file" accept=".txt" required>
+                            <div class="invalid-feedback">Please select a text file.</div>
+                            <div class="form-text text-muted">Upload the file that was created by the Hide Message feature</div>
                         </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-unlock-alt me-2"></i>Extract Intel
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-info btn-lg">
+                                <i class="fas fa-search me-2"></i>Extract Message
                             </button>
                         </div>
                     </form>
-
+                    
                     {% if extracted_message %}
                     <div class="mt-4">
-                        <h5 class="mb-3 text-accent" style="color: var(--accent-color);">Decrypted Intelligence:</h5>
-                        <div class="alert alert-info border-info bg-dark-subtle">
-                            <p class="mb-0 font-monospace">{{ extracted_message }}</p>
+                        <h5>Extracted Message:</h5>
+                        <div class="alert alert-info">
+                            <p class="mb-0">{{ extracted_message }}</p>
                         </div>
                     </div>
                     {% endif %}
@@ -84,20 +76,20 @@
 
 {% block scripts %}
 <script>
-    // Form validation
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
 </script>
-{% endblock %}
+{% endblock %} 

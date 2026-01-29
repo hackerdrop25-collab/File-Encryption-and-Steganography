@@ -9,22 +9,19 @@
 
     <div class="row justify-content-center">
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
+            <div class="card shadow h-100">
                 <div class="card-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-lock fa-4x" style="color: var(--accent-color);"></i>
-                    </div>
-                    <h3 class="card-title mb-3">File Encryption</h3>
-                    <p class="card-text text-muted mb-4">Protect your sensitive files with strong military-grade
-                        encryption</p>
-                    <div class="d-grid gap-3">
+                    <i class="fas fa-lock fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title">File Encryption</h3>
+                    <p class="card-text">Protect your sensitive files with strong encryption</p>
+                    <div class="d-grid gap-2">
                         <a href="/generate_key" class="btn btn-primary">
                             <i class="fas fa-key me-2"></i>Generate Key
                         </a>
                         <a href="/encrypt" class="btn btn-primary">
                             <i class="fas fa-lock me-2"></i>Encrypt File
                         </a>
-                        <a href="/decrypt" class="btn btn-primary" style="background-color: #10b981; color: #fff;">
+                        <a href="/decrypt" class="btn btn-success">
                             <i class="fas fa-unlock me-2"></i>Decrypt File
                         </a>
                     </div>
@@ -33,17 +30,13 @@
         </div>
 
         <div class="col-md-6 mb-4">
-            <div class="card h-100">
+            <div class="card shadow h-100">
                 <div class="card-body text-center">
-                    <div class="mb-4">
-                        <i class="fas fa-user-secret fa-4x" style="color: #f59e0b;"></i>
-                    </div>
-                    <h3 class="card-title mb-3">Steganography</h3>
-                    <p class="card-text text-muted mb-4">Hide and extract secret messages using advanced steganography
-                    </p>
-                    <div class="d-grid gap-3">
-                        <a href="/steganography" class="btn btn-primary"
-                            style="background-color: #f59e0b; color: #fff;">
+                    <i class="fas fa-user-secret fa-3x text-info mb-3"></i>
+                    <h3 class="card-title">Steganography</h3>
+                    <p class="card-text">Hide and extract messages using steganography</p>
+                    <div class="d-grid gap-2">
+                        <a href="/steganography" class="btn btn-info">
                             <i class="fas fa-user-secret me-2"></i>Go to Steganography
                         </a>
                     </div>
@@ -52,46 +45,29 @@
         </div>
     </div>
 
-    <div class="row justify-content-center mt-5">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>How It Works</h5>
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">How It Works</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-6 mb-4 mb-md-0">
-                            <h6 class="text-accent mb-3" style="color: var(--accent-color);">File Encryption:</h6>
-                            <div class="list-group list-group-flush bg-transparent">
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-primary rounded-pill me-2">1</span> Generate an encryption key
-                                </div>
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-primary rounded-pill me-2">2</span> Use the key to encrypt
-                                    your files
-                                </div>
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-primary rounded-pill me-2">3</span> Use the same key to
-                                    decrypt files
-                                </div>
-                            </div>
+                        <div class="col-md-6">
+                            <h6>File Encryption:</h6>
+                            <ol class="list-group list-group-numbered">
+                                <li class="list-group-item">Generate an encryption key</li>
+                                <li class="list-group-item">Use the key to encrypt your files</li>
+                                <li class="list-group-item">Use the same key to decrypt files</li>
+                            </ol>
                         </div>
                         <div class="col-md-6">
-                            <h6 class="text-accent mb-3" style="color: #f59e0b;">Steganography:</h6>
-                            <div class="list-group list-group-flush bg-transparent">
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-warning rounded-pill me-2 text-dark">1</span> Hide messages in
-                                    text files
-                                </div>
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-warning rounded-pill me-2 text-dark">2</span> Extract hidden
-                                    messages
-                                </div>
-                                <div class="list-group-item bg-transparent text-main border-0 ps-0">
-                                    <span class="badge bg-warning rounded-pill me-2 text-dark">3</span> Keep your
-                                    secrets safe
-                                </div>
-                            </div>
+                            <h6>Steganography:</h6>
+                            <ol class="list-group list-group-numbered">
+                                <li class="list-group-item">Hide messages in text files</li>
+                                <li class="list-group-item">Extract hidden messages</li>
+                                <li class="list-group-item">Keep your secrets safe</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
@@ -103,20 +79,20 @@
 
 {% block scripts %}
 <script>
-    // Form validation
-    (function () {
-        'use strict'
-        var forms = document.querySelectorAll('.needs-validation')
-        Array.prototype.slice.call(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
+// Form validation
+(function () {
+    'use strict'
+    var forms = document.querySelectorAll('.needs-validation')
+    Array.prototype.slice.call(forms)
+        .forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+})()
 </script>
-{% endblock %}
+{% endblock %} 
