@@ -10,8 +10,6 @@ from cryptography.fernet import Fernet
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-here'  
 crypto = CryptoStego()
-
-# Configure upload folder
 UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -26,7 +24,7 @@ def safe_remove(file_path, max_attempts=3):
             return True
         except Exception as e:
             if attempt < max_attempts - 1:
-                time.sleep(0.1)  # Wait before retrying
+                time.sleep(0.1) 
             else:
                 print(f"Warning: Could not remove file {file_path}: {str(e)}")
                 return False
@@ -40,7 +38,6 @@ def safe_send_file(file_path, download_name=None):
         )
         return response
     finally:
-        # Schedule file cleanup
         safe_remove(file_path)
 def allowed_file(filename):
     """Check if the file extension is allowed"""
@@ -68,7 +65,6 @@ def steganography():
 def generate_key():
     if request.method == 'GET':
         return render_template('generate_key.html')
-    
     try:
         key = crypto.generate_key()
         key_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'key.key')
@@ -81,39 +77,26 @@ def generate_key():
 def encrypt():
     if request.method == 'GET':
         return render_template('encrypt.html')
-    
     if 'file' not in request.files or 'key' not in request.files:
         flash('Please select both a file and a key file', 'error')
         return redirect(url_for('encrypt'))
-    
     file = request.files['file']
     key_file = request.files['key']
-    
     if file.filename == '' or key_file.filename == '':
         flash('No selected file', 'error')
         return redirect(url_for('encrypt'))
-    
     try:
-        # Save uploaded files
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         key_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(key_file.filename))
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'encrypted_{secure_filename(file.filename)}')
-        
         file.save(file_path)
         key_file.save(key_path)
-        
-        # Load key
         with open(key_path, 'rb') as f:
             key = f.read()
         crypto.cipher_suite = Fernet(key)
-        
-        # Encrypt file
         crypto.encrypt_file(file_path, output_path)
-        
-        # Clean up
         safe_remove(file_path)
         safe_remove(key_path)
-        
         return safe_send_file(output_path, f"encrypted_{file.filename}")
     except Exception as e:
         flash(f'Error during encryption: {str(e)}', 'error')
@@ -122,39 +105,26 @@ def encrypt():
 def decrypt():
     if request.method == 'GET':
         return render_template('decrypt.html')
-    
     if 'file' not in request.files or 'key' not in request.files:
         flash('Please select both a file and a key file', 'error')
         return redirect(url_for('decrypt'))
-    
     file = request.files['file']
     key_file = request.files['key']
-    
     if file.filename == '' or key_file.filename == '':
         flash('No selected file', 'error')
         return redirect(url_for('decrypt'))
-    
     try:
-        # Save uploaded files
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         key_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(key_file.filename))
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'decrypted_{secure_filename(file.filename)}')
-        
         file.save(file_path)
         key_file.save(key_path)
-        
-        # Load key
         with open(key_path, 'rb') as f:
             key = f.read()
         crypto.cipher_suite = Fernet(key)
-        
-        # Decrypt file
         crypto.decrypt_file(file_path, output_path)
-        
-        # Clean up
         safe_remove(file_path)
         safe_remove(key_path)
-        
         return safe_send_file(output_path, f"decrypted_{file.filename}")
     except Exception as e:
         flash(f'Error during decryption: {str(e)}', 'error')
@@ -164,36 +134,24 @@ def hide_message():
     if 'file' not in request.files or 'message' not in request.form:
         flash('No file selected or message provided', 'error')
         return redirect(url_for('steganography'))
-    
     file = request.files['file']
     message = request.form['message']
-    
     if file.filename == '' or not message:
         flash('No file selected or message provided', 'error')
         return redirect(url_for('steganography'))
-    
     if not allowed_file(file.filename):
         flash('Only text files (.txt) are supported', 'error')
         return redirect(url_for('steganography'))
-    
     try:
-        # Save uploaded file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         file.save(file_path)
-        
-        # Verify it's a text file
         if not is_text_file(file_path):
             os.remove(file_path)
             flash('The file is not a valid text file', 'error')
             return redirect(url_for('steganography'))
-        
-        # Hide message
         output_path = os.path.join(app.config['UPLOAD_FOLDER'], f'hidden_{secure_filename(file.filename)}')
         crypto.hide_message(file_path, message, output_path)
-        
-        # Clean up
         os.remove(file_path)
-        
         return send_file(output_path, as_attachment=True)
     except Exception as e:
         flash(f'Failed to hide message: {str(e)}', 'error')
@@ -203,34 +161,22 @@ def extract_message():
     if 'file' not in request.files:
         flash('No file selected', 'error')
         return redirect(url_for('steganography'))
-    
     file = request.files['file']
-    
     if file.filename == '':
         flash('No file selected', 'error')
         return redirect(url_for('steganography'))
-    
     if not allowed_file(file.filename):
         flash('Only text files (.txt) are supported', 'error')
         return redirect(url_for('steganography'))
-    
     try:
-        # Save uploaded file
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
         file.save(file_path)
-        
-        # Verify it's a text file
         if not is_text_file(file_path):
             os.remove(file_path)
             flash('The file is not a valid text file', 'error')
             return redirect(url_for('steganography'))
-        
-        # Extract message
         message = crypto.extract_message(file_path)
-        
-        # Clean up
         os.remove(file_path)
-        
         return render_template('steganography.html', extracted_message=message)
     except Exception as e:
         flash(f'Failed to extract message: {str(e)}', 'error')
