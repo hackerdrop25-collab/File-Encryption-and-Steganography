@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,74 +8,157 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --bg-nav: #1a1a1a;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --border-color: #333;
+            --input-bg: #2b2b2b;
+        }
+
         body {
-            background-color: #f8f9fa;
+            background-color: var(--bg-body);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
+
         .navbar {
-            background-color: #343a40;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background-color: var(--bg-nav) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
+
         .navbar-brand {
             font-weight: bold;
+            color: #fff !important;
         }
+
         .card {
-            border: none;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
             margin-bottom: 20px;
         }
+
         .card-header {
-            background-color: #343a40;
+            background-color: #2d2d2d !important;
             color: white;
             border-radius: 10px 10px 0 0 !important;
+            border-bottom: 1px solid var(--border-color);
         }
+
+        /* Override bootstrap bg utilities if they are too bright, or leave them. 
+           The user wants specific dark mode. Let's make headers dark grey for consistency 
+           unless they really need color differentiation. 
+           But the user code uses bg-primary/bg-info heavily. 
+           Let's override them for a "true" dark theme feel or just let them be.
+           For now I'll force the header color to ensure readability and dark theme consistency.
+        */
+
         .btn-primary {
-            background-color: #343a40;
-            border-color: #343a40;
+            background-color: #375a7f;
+            border-color: #375a7f;
         }
+
         .btn-primary:hover {
-            background-color: #23272b;
-            border-color: #23272b;
+            background-color: #2b4764;
+            border-color: #2b4764;
         }
+
         .alert {
             border-radius: 10px;
+            background-color: #2c2c2c;
+            border-color: #444;
+            color: #fff;
         }
+
+        .alert-info {
+            background-color: #1c3d4d;
+            border-color: #26546a;
+            color: #fff;
+        }
+
         .main-content {
             flex: 1;
             padding: 20px 0;
         }
+
         footer {
-            background-color: #343a40;
-            color: white;
+            background-color: var(--bg-nav);
+            color: var(--text-muted);
             padding: 20px 0;
             margin-top: auto;
+            border-top: 1px solid var(--border-color);
         }
+
         .nav-link {
-            color: rgba(255,255,255,0.8);
+            color: rgba(255, 255, 255, 0.7) !important;
             transition: color 0.3s;
         }
+
         .nav-link:hover {
-            color: white;
+            color: #fff !important;
         }
+
+        /* Form Styles */
+        .form-control,
+        .form-select {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: #333;
+            border-color: #555;
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: #777;
+        }
+
+        .form-label {
+            color: var(--text-main);
+        }
+
+        .form-text {
+            color: var(--text-muted) !important;
+        }
+
+        /* List Group */
+        .list-group-item {
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border-color: var(--border-color);
+        }
+
+        /* Mobile overrides */
         @media (max-width: 768px) {
             .card {
                 margin-bottom: 15px;
             }
+
             .btn {
                 width: 100%;
                 margin-bottom: 10px;
             }
+
             .navbar-collapse {
-                background-color: #343a40;
+                background-color: var(--bg-nav);
                 padding: 10px;
                 border-radius: 5px;
             }
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -119,16 +203,16 @@
     <div class="main-content">
         <div class="container">
             {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
             {% endwith %}
-            
+
             {% block content %}{% endblock %}
         </div>
     </div>
@@ -148,4 +232,5 @@
         })
     </script>
 </body>
-</html> 
+
+</html>
