@@ -1,27 +1,31 @@
 from cryptography.fernet import Fernet
 import os
-import random
-import time
-import base64
-import re
+import io
+from PIL import Image
+import numpy as np
+
 class CryptoStego:
     def __init__(self):
         self.key = None
         self.cipher_suite = None
+
     def generate_key(self):
         """Generate a new encryption key."""
         self.key = Fernet.generate_key()
         self.cipher_suite = Fernet(self.key)
         return self.key
+
     def save_key(self, filename):
         """Save the encryption key to a file."""
         with open(filename, 'wb') as key_file:
             key_file.write(self.key)
+
     def load_key(self, filename):
         """Load an encryption key from a file."""
         with open(filename, 'rb') as key_file:
             self.key = key_file.read()
             self.cipher_suite = Fernet(self.key)
+
     def encrypt_file(self, input_file, output_file):
         """Encrypt a file using the loaded key."""
         try:
@@ -32,6 +36,7 @@ class CryptoStego:
                 file.write(encrypted_data)
         except Exception as e:
             raise Exception(f"Encryption failed: {str(e)}")
+
     def decrypt_file(self, input_file, output_file):
         """Decrypt a file using the loaded key."""
         try:
@@ -42,81 +47,90 @@ class CryptoStego:
                 file.write(decrypted_data)
         except Exception as e:
             raise Exception(f"Decryption failed: {str(e)}")
-    def calculate_required_lines(self, message):
-        """Calculate the number of lines required to hide a message."""
+
+    # Image Steganography Methods (LSB)
+
+    def _message_to_binary(self, message):
+        """Convert a string to binary."""
+        if type(message) == str:
+            return ''.join([format(ord(i), "08b") for i in message])
+        elif type(message) == bytes:
+            return ''.join([format(i, "08b") for i in message])
+        elif type(message) == np.ndarray:
+            return [format(i, "08b") for i in message]
+        elif type(message) == int or type(message) == np.uint8:
+            return format(message, "08b")
+        else:
+            raise TypeError("Input type not supported")
+
+    def hide_message(self, image_path, message, output_path):
+        """Hide a message in an image using LSB steganography."""
         try:
-            encoded_message = base64.b64encode(message.encode()).decode()
-            return len(encoded_message)
-        except Exception as e:
-            raise ValueError(f"Failed to calculate required lines: {str(e)}")
-    def hide_message(self, input_file, message, output_file):
-        """Hide a message in a text file using steganography."""
-        try:
-            if not message or not isinstance(message, str):
-                raise ValueError("Invalid message: Message must be a non-empty string")
+            # Append a delimiter to know when the message ends
+            message += "#####"
             
-            if not os.path.exists(input_file):
-                raise ValueError(f"Input file not found: {input_file}")
-            if not self._is_text_file(input_file):
-                raise ValueError("Only text files (.txt) are supported for hiding messages")
-            with open(input_file, 'r', encoding='utf-8', errors='ignore') as file:
-                lines = file.readlines()
-            required_lines = self.calculate_required_lines(message)
-            if len(lines) < required_lines:
-                raise ValueError(f"Message is too long for the text file. Required lines: {required_lines}, Available lines: {len(lines)}. Please use a longer text file or a shorter message.")
-            encoded_message = base64.b64encode(message.encode()).decode()
-            modified_lines = []
-            message_index = 0
+            # Open image
+            image = Image.open(image_path)
+            # Convert to RGB if not already (handle RGBA, P, etc by converting to RGB, though RGBA support would be better if we want to preserve transparency, strict RGB is safer for basic LSB)
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+                
+            image_array = np.array(image)
             
-            for line in lines:
-                if message_index < len(encoded_message):
-                    modified_lines.append(line.rstrip() + ' ' + encoded_message[message_index] + '\n')
-                    message_index += 1
-                else:
-                    modified_lines.append(line)
-            with open(output_file, 'w', encoding='utf-8') as file:
-                file.writelines(modified_lines)
-            try:
-                extracted = self.extract_message(output_file)
-                if extracted != message:
-                    raise ValueError("Message verification failed - the hidden message could not be properly extracted")
-            except Exception as e:
-                if os.path.exists(output_file):
-                    os.remove(output_file)
-                raise ValueError(f"Message verification failed: {str(e)}")
+            # Check if message fits
+            max_bytes = (image_array.shape[0] * image_array.shape[1] * 3) // 8
+            if len(message) > max_bytes:
+                raise ValueError(f"Message too long. Image can hold {max_bytes} characters, but message is {len(message)} characters.")
+
+            binary_message = self._message_to_binary(message)
+            data_len = len(binary_message)
+            
+            flat_image = image_array.flatten()
+            
+            # Modify the least significant bit
+            for i in range(data_len):
+                flat_image[i] = (flat_image[i] & 254) | int(binary_message[i])
+                
+            # Reshape back to image
+            encoded_image_array = flat_image.reshape(image_array.shape)
+            encoded_image = Image.fromarray(encoded_image_array.astype('uint8'), 'RGB')
+            
+            # Save the image (must be PNG to be lossless)
+            if not output_path.lower().endswith('.png'):
+                output_path = os.path.splitext(output_path)[0] + '.png'
+                
+            encoded_image.save(output_path)
+            return output_path
+
         except Exception as e:
             raise Exception(f"Failed to hide message: {str(e)}")
-    def extract_message(self, input_file):
-        """Extract a hidden message from a text file."""
-        try:
-            if not os.path.exists(input_file):
-                raise ValueError(f"Input file not found: {input_file}")
-            if not self._is_text_file(input_file):
-                raise ValueError("Only text files (.txt) are supported for extracting messages")
-            with open(input_file, 'r', encoding='utf-8', errors='ignore') as file:
-                lines = file.readlines()
-            hidden_chars = []
-            for line in lines:
-                match = re.search(r' (.)$', line.rstrip())
-                if match:
-                    hidden_chars.append(match.group(1))
 
-            if not hidden_chars:
-                raise ValueError("No hidden message found in the file")
-            encoded_message = ''.join(hidden_chars)
-            try:
-                message = base64.b64decode(encoded_message).decode()
-                return message
-            except Exception as e:
-                raise ValueError(f"Invalid message format or corrupted data: {str(e)}")
+    def extract_message(self, image_path):
+        """Extract a hidden message from an image."""
+        try:
+            image = Image.open(image_path)
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
+                
+            image_array = np.array(image)
+            flat_image = image_array.flatten()
+            
+            binary_data = ""
+            for i in range(len(flat_image)):
+                binary_data += str(flat_image[i] & 1)
+
+            # Split by 8 bits
+            all_bytes = [binary_data[i: i+8] for i in range(0, len(binary_data), 8)]
+            
+            decoded_data = ""
+            for byte in all_bytes:
+                decoded_data += chr(int(byte, 2))
+                if decoded_data[-5:] == "#####":
+                    return decoded_data[:-5]
+            
+            # If we didn't find the delimiter
+            return "No hidden message found (or delimiter missing)"
 
         except Exception as e:
             raise Exception(f"Failed to extract message: {str(e)}")
-    def _is_text_file(self, file_path):
-        """Check if a file is a text file."""
-        try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
-                file.read(1024)
-            return True
-        except:
-            return False 
+ 
