@@ -156,6 +156,52 @@
                 border-radius: 5px;
             }
         }
+
+        /* Force overrides for better visibility */
+        .text-muted {
+            color: #b0b0b0 !important;
+        }
+
+        .text-body-secondary {
+            color: #b0b0b0 !important;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        .h1,
+        .h2,
+        .h3,
+        .h4,
+        .h5,
+        .h6 {
+            color: #ffffff !important;
+        }
+
+        /* Ensure card body text is visible */
+        .card-body,
+        .card {
+            color: var(--text-main);
+        }
+
+        /* Buttons */
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* Input specific tweaks */
+        input[type="file"]::file-selector-button {
+            background-color: #444;
+            color: #fff;
+            border: 1px solid #666;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 
